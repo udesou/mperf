@@ -566,9 +566,15 @@ typedef struct {
 // Privileges
 // ============================================================================
 
+<<<<<<< HEAD
 // The user who mperf runs on behalf of. Programming the PMU needs root: the 
 // measured command, and every file opened by name, belong to the user who 
 // invoked mperf, whether root came from sudo or from a setuid install.
+=======
+// Who mperf runs on behalf of. Programming the PMU needs root, nothing else
+// does: the measured command, and every file opened by name, belong to the
+// user who invoked mperf, whether root came from sudo or from a setuid install.
+>>>>>>> c07f135 (Attach with -p, take perf's --control, and drop root for the command)
 typedef struct {
     bool drop;         // false when root itself ran mperf, without sudo
     bool setuid;       // setuid install: the real uid is the invoking user
@@ -613,13 +619,21 @@ static bool invoker_init(void) {
 static bool drop_privileges(void) {
     if (!g_invoker.drop) return true;
 
+<<<<<<< HEAD
+=======
+    // A setuid process already has the user's supplementary groups; under sudo
+    // they are root's and have to be replaced.
+>>>>>>> c07f135 (Attach with -p, take perf's --control, and drop root for the command)
     if (!g_invoker.setuid) {
         int rc = g_invoker.name ? initgroups(g_invoker.name, (int)g_invoker.gid)
                                 : setgroups(1, &g_invoker.gid);
         if (rc != 0) return false;
     }
     if (setgid(g_invoker.gid) != 0 || setuid(g_invoker.uid) != 0) return false;
+<<<<<<< HEAD
 
+=======
+>>>>>>> c07f135 (Attach with -p, take perf's --control, and drop root for the command)
     // setuid() as root sets the saved uid too; make sure root is really gone.
     return setuid(0) != 0 && getuid() == g_invoker.uid && geteuid() == g_invoker.uid;
 }
@@ -671,10 +685,17 @@ static bool may_attach(pid_t pid) {
 // Control protocol (perf stat --delay -1 --control)
 // ============================================================================
 
+<<<<<<< HEAD
 // Implements some of perf's --control protocol for an armed start: block for "enable",
 // set up, then answer "ack\n" once counting. A harness that already drives
 // `perf stat --delay -1 --control fifo:ctl,ack` drives mperf the same way.
 // "ping" is acknowledged as perf does and anything else is reported and ignored.
+=======
+// Enough of perf's --control protocol for an armed start: block for "enable",
+// set up, then answer "ack\n" once counting. A harness that already drives
+// `perf stat --delay -1 --control fifo:ctl,ack` drives mperf the same way.
+// "ping" is acknowledged as perf does; anything else is reported and ignored.
+>>>>>>> c07f135 (Attach with -p, take perf's --control, and drop root for the command)
 //
 // Unlike perf, a command mperf launches is held until counting starts rather
 // than started straight away with events disabled: threads it creates before
@@ -747,7 +768,11 @@ static bool control_wait_enable(const control_t *c) {
 // PET-based measurement (accurate, multi-threaded)
 // ============================================================================
 
+<<<<<<< HEAD
 // `exit_kq` is set in attach mode (-p): the target is not mperf's child, so its
+=======
+// `exit_kq` is set in attach mode (-p): the target is not our child, so its
+>>>>>>> c07f135 (Attach with -p, take perf's --control, and drop root for the command)
 // exit is watched through kqueue, which also fires while it is still an
 // unreaped zombie of whoever does own it.
 static bool run_with_pet(pmc_state_t *state, pid_t target_pid,
@@ -1105,7 +1130,11 @@ static bool run_command_pet(pmc_state_t *state, char **argv, double sample_perio
     }
 
     if (pid == 0) {
+<<<<<<< HEAD
         // Child: because the PMU is processed via the parent, the command runs as the
+=======
+        // Child: the PMU is the parent's business, so the command runs as the
+>>>>>>> c07f135 (Attach with -p, take perf's --control, and drop root for the command)
         // invoking user rather than as root.
         if (!drop_privileges()) {
             perror("mperf: cannot drop privileges");
@@ -1521,7 +1550,11 @@ int main(int argc, char **argv) {
                 break;
             }
             case 'D':
+<<<<<<< HEAD
                 // perf also takes a positive delay in ms, we currently only support -1
+=======
+                // perf also takes a positive delay in ms; nothing needs it here.
+>>>>>>> c07f135 (Attach with -p, take perf's --control, and drop root for the command)
                 if (strcmp(optarg, "-1") != 0) {
                     fprintf(stderr, "Error: only --delay -1 is supported\n");
                     return 1;
@@ -1559,8 +1592,15 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+<<<<<<< HEAD
     if (delayed != (control_spec != NULL)) {
         fprintf(stderr, "Error: --delay -1 must go with --control\n");
+=======
+    // perf would never enable a --delay -1 run without a control channel, and
+    // would only answer --control commands while running; neither is useful.
+    if (delayed != (control_spec != NULL)) {
+        fprintf(stderr, "Error: --delay -1 and --control go together\n");
+>>>>>>> c07f135 (Attach with -p, take perf's --control, and drop root for the command)
         return 1;
     }
 
