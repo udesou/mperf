@@ -26,11 +26,7 @@ hello
              1,234,567  cycles
 ```
 
-<<<<<<< HEAD
 Note that only the PMU needs root: the measured command, and files opened for `-o` and `--control`, belong to the invoking user (`SUDO_UID` under sudo).
-=======
-Only the PMU needs root: the measured command, and files opened for `-o` and `--control`, belong to the invoking user (`SUDO_UID` under sudo).
->>>>>>> c07f135 (Attach with -p, take perf's --control, and drop root for the command)
 
 ### Running without sudo
 
